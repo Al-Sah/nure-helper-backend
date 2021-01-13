@@ -22,6 +22,15 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/files-manager-service" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/files-manager-service" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/meta-info-service" />
         <option name="modules">
           <set>
