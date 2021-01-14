@@ -1,13 +1,14 @@
 package devs.nure.metainfoservice.services;
 
+import devs.nure.metainfoservice.Dto.DirectoryDto;
+import devs.nure.metainfoservice.forms.CreateDirectory;
+import devs.nure.metainfoservice.forms.UpdateDirectory;
+
 public interface DirectoryService {
 
-    Object addDirectory(Object obj);
-
-    Object updateDirectory(Object obj);
-
-    void removeDirectory(Object obj);
-
+    DirectoryDto addDirectory(CreateDirectory obj);
+    DirectoryDto updateDirectory(UpdateDirectory obj);
+    void removeDirectory(String dirID);
     Object showDirectories();
 
 }
