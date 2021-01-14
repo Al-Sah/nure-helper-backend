@@ -9,6 +9,7 @@ public interface DirectoryService {
     DirectoryDto addDirectory(CreateDirectory obj);
     DirectoryDto updateDirectory(UpdateDirectory obj);
     void removeDirectory(String dirID);
+    DirectoryDto showDirectory(String dirUniqID);
     Object showDirectories();
 
 }
