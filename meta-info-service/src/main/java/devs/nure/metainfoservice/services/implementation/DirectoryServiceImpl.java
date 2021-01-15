@@ -1,82 +1,116 @@
 package devs.nure.metainfoservice.services.implementation;
 
 import devs.nure.metainfoservice.Dto.DirectoryDto;
-import devs.nure.metainfoservice.forms.CreateDirectory;
-import devs.nure.metainfoservice.forms.UpdateDirectory;
+import devs.nure.metainfoservice.forms.*;
 import devs.nure.metainfoservice.models.CustomDirectory;
+import devs.nure.metainfoservice.models.State;
+import devs.nure.metainfoservice.exceptions.*;
 import devs.nure.metainfoservice.repositories.DirectoryRepository;
 import devs.nure.metainfoservice.services.DirectoryService;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.UUID;
+import javax.annotation.PostConstruct;
+import java.util.*;
 
 @Service
 public class DirectoryServiceImpl implements DirectoryService {
 
     private final DirectoryRepository directoryRepository;
-
     public DirectoryServiceImpl(DirectoryRepository directoryRepository) {
         this.directoryRepository = directoryRepository;
     }
 
+    @PostConstruct
+    private void rootInit(){
+        CustomDirectory customDirectory = new CustomDirectory(
+                "root", "root",
+                "rootDirStudHelper", null, "",
+                "ROOT","ROOT",
+                new Date(), new Date(), State.CREATED );
+        directoryRepository.save(customDirectory);
+    }
 
     @Override
     public DirectoryDto addDirectory(CreateDirectory directory) {
-
-        CustomDirectory customDirectory = new CustomDirectory();
-
-        //directory parameters
-        customDirectory.setShortName(directory.getShortName());
-        customDirectory.setFullName(directory.getFullName());
-        customDirectory.setDescription(directory.getDescription());
-        customDirectory.setCreationAuthor(directory.getAuthor());
-
-        //other parameters
-        customDirectory.setCreated(new Date());
-        customDirectory.setUniqID(UUID.randomUUID().toString());
-        customDirectory.setModificationAuthor(customDirectory.getCreationAuthor());
-        customDirectory.setLastModification(customDirectory.getCreated());
-        customDirectory.setState(null);
-
+        CustomDirectory customDirectory = new CustomDirectory(
+                directory.getShortName(),
+                directory.getFullName(),
+                UUID.randomUUID().toString(),
+                directory.getParentID(),
+                directory.getDescription(),
+                directory.getAuthor(),
+                directory.getAuthor(),
+                new Date(), new Date(),
+                State.CREATED );
         directoryRepository.save(customDirectory);
-
         return new DirectoryDto(customDirectory);
-
     }
 
     @Override
     public DirectoryDto updateDirectory(UpdateDirectory directory) {
-
-        CustomDirectory customDirectory = new CustomDirectory();
-
+        CustomDirectory customDirectory = directoryRepository
+                .findByUniqID(directory.getUniqId())
+                .orElseThrow(() -> new DirectoryNotFoundException("directory not found "));
         customDirectory.setShortName(directory.getShortName());
         customDirectory.setFullName(directory.getFullName());
         customDirectory.setDescription(directory.getDescription());
-        customDirectory.setUniqID(directory.getUniqId());
         customDirectory.setModificationAuthor(directory.getModificationAuthor());
-
         customDirectory.setLastModification(new Date());
-        customDirectory.setState(null); // UPDATED
+        customDirectory.setState(State.UPDATED);
 
         directoryRepository.save(customDirectory);
-
         return new DirectoryDto(customDirectory);
     }
 
     @Override
-    public void removeDirectory(String dirUniqID) {
-        directoryRepository.deleteByUniqID(dirUniqID);
+    public void removeDirectory(ChangeStatusDirectory deleteDirectory) {
+        CustomDirectory directory =  directoryRepository.findByUniqID(deleteDirectory.getDirectoryId())
+                .orElseThrow(() -> new DirectoryNotFoundException("directory not found "));
+        directory.setState(State.DELETED);
+        directory.setLastModification(new Date());
+        directory.setModificationAuthor(deleteDirectory.getAuthor());
+        directoryRepository.save(directory);
     }
 
     @Override
-    public DirectoryDto showDirectory(String dirUniqId) {
-
-        return new DirectoryDto(directoryRepository.findByUniqID(dirUniqId).orElseThrow(() -> new RuntimeException("")));
+    public DirectoryDto showDirectoryDescription(String dirUniqId) {
+        return new DirectoryDto(directoryRepository.findByUniqID(dirUniqId)
+                .orElseThrow(() -> new DirectoryNotFoundException("directory not found ")));
     }
 
     @Override
-    public Object showDirectories() {
-        return null;
+    public DirectoryNode showDirectory(String dirUniqID) {
+        DirectoryDto dirData = new DirectoryDto(directoryRepository.findByUniqID(dirUniqID)
+                .orElseThrow(() -> new DirectoryNotFoundException("directory not found ")));
+        List<CustomDirectory> madelDirectories = directoryRepository.findAllByParentID(dirData.getUniqID());
+        List<DirectoryDto> directoryDtos = new LinkedList<>();
+        for (var element: madelDirectories) {
+            directoryDtos.add(new DirectoryDto(element));
+        }
+        return new DirectoryNode(dirData, directoryDtos);
+    }
+
+    @Override
+    public TreeNode generateDirectoriesTree(String thisID){
+        TreeNode newNode = new TreeNode();
+        BasicDirectoryInfo data = new BasicDirectoryInfo(directoryRepository.findByUniqID(thisID)
+                .orElseThrow(() -> new DirectoryNotFoundException("directory not found ")));
+        newNode.setData(data);
+        newNode.setChildren(new ArrayList<>());
+        List<CustomDirectory> madelDirectories = directoryRepository.findAllByParentID(thisID);
+        for (var element : madelDirectories) {
+            newNode.getChildren().add(generateDirectoriesTree(element.getUniqID()));
+        }
+        return newNode;
+    }
+
+    @Override
+    public void recoverDirectory(ChangeStatusDirectory recoverDirectory) {
+        CustomDirectory directory =  directoryRepository.findByUniqID(recoverDirectory.getDirectoryId())
+                .orElseThrow(() -> new DirectoryNotFoundException("directory not found "));
+        directory.setState(State.RECOVERED);
+        directory.setLastModification(new Date());
+        directory.setModificationAuthor(recoverDirectory.getAuthor());
+        directoryRepository.save(directory);
     }
 }

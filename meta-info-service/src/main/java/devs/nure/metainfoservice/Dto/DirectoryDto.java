@@ -11,6 +11,7 @@ public class DirectoryDto {
     private String shortName;
     private String fullName;
     private String uniqID;
+    private String parentID;
     private String description;
     private String creationAuthor;
     private String modificationAuthor;
@@ -22,13 +23,12 @@ public class DirectoryDto {
         this.shortName = directory.getShortName();
         this.fullName = directory.getFullName();
         this.uniqID = directory.getUniqID();
+        this.parentID = directory.getParentID();
         this.description = directory.getDescription();
         this.creationAuthor = directory.getCreationAuthor();
         this.modificationAuthor = directory.getModificationAuthor();
         this.created = directory.getCreated();
         this.lastModification = directory.getLastModification();
-        this.state =directory.getState();
+        this.state = directory.getState().toString();
     }
-
-
 }

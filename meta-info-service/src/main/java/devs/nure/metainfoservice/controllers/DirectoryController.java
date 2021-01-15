@@ -2,6 +2,8 @@ package devs.nure.metainfoservice.controllers;
 
 import devs.nure.metainfoservice.Dto.DirectoryDto;
 import devs.nure.metainfoservice.forms.CreateDirectory;
+import devs.nure.metainfoservice.forms.ChangeStatusDirectory;
+import devs.nure.metainfoservice.forms.DirectoryNode;
 import devs.nure.metainfoservice.forms.UpdateDirectory;
 import devs.nure.metainfoservice.resource.ErrorMessage;
 import devs.nure.metainfoservice.services.DirectoryService;
@@ -20,31 +22,38 @@ public class DirectoryController {
         this.directoryService = directoryService;
     }
 
-    @PostMapping("/create")
+    @PostMapping("/")
     public DirectoryDto addDirectory(@Valid @RequestBody CreateDirectory directory) {
-        return null;
+        return directoryService.addDirectory(directory);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/")
     public DirectoryDto updateDirectory(@Valid @RequestBody UpdateDirectory directory) {
-        return null;
+        return directoryService.updateDirectory(directory);
+    }
+    @PutMapping("/recover")
+    public void recoverDirectory(@Valid @RequestBody ChangeStatusDirectory recoverDirectory) {
+        directoryService.recoverDirectory(recoverDirectory);
     }
 
-    @DeleteMapping("/delete")
-    public void removeDirectory(@RequestParam String dirUniqID){
+    @DeleteMapping("/")
+    public void removeDirectory(@Valid @RequestBody ChangeStatusDirectory deleteDirectory){
+        directoryService.removeDirectory(deleteDirectory);
+    }
+
+    @GetMapping("/info/{dirUniqID}")
+    public DirectoryDto showDirectoryDescription(@PathVariable String dirUniqID) {
+        return directoryService.showDirectoryDescription(dirUniqID);
     }
 
     @GetMapping("/{dirUniqID}")
-    public Object showDirectoryDescription(@PathVariable String dirUniqID) {
-        return null;
+    public DirectoryNode showDirectory(@PathVariable String dirUniqID) {
+        return directoryService.showDirectory(dirUniqID);
     }
-    @GetMapping("/info/{dirUniqID}")
-    public DirectoryDto showDirectory(@PathVariable String dirUniqID) {
-        return null;
-    }
-    @GetMapping("/tree")
-    public Object showDirectoriesTree() {
-        return null;
+
+    @GetMapping("/tree/{dirUniqID}")
+    public Object showDirectoriesTree(@PathVariable String dirUniqID) {
+        return directoryService.generateDirectoriesTree(dirUniqID);
     }
 
     @ExceptionHandler

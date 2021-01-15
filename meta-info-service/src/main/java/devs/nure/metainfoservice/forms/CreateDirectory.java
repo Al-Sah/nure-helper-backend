@@ -1,6 +1,5 @@
 package devs.nure.metainfoservice.forms;
 
-import devs.nure.metainfoservice.models.CustomDirectory;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -15,5 +14,7 @@ public class CreateDirectory {
     private String description;
     @NotBlank(message = "author cannot be empty")
     private String author;
+    @NotBlank(message = "parentID cannot be empty")
+    private String parentID;
 
 }
