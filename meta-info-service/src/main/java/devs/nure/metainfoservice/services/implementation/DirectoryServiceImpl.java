@@ -32,18 +32,22 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public DirectoryDto addDirectory(CreateDirectory directory) {
-        CustomDirectory customDirectory = new CustomDirectory(
-                directory.getShortName(),
-                directory.getFullName(),
-                UUID.randomUUID().toString(),
-                directory.getParentID(),
-                directory.getDescription(),
-                directory.getAuthor(),
-                directory.getAuthor(),
-                new Date(), new Date(),
-                State.CREATED );
-        directoryRepository.save(customDirectory);
-        return new DirectoryDto(customDirectory);
+        if (directoryRepository.existsByUniqID(directory.getParentID())) {
+            CustomDirectory customDirectory = new CustomDirectory(
+                    directory.getShortName(),
+                    directory.getFullName(),
+                    UUID.randomUUID().toString(),
+                    directory.getParentID(),
+                    directory.getDescription(),
+                    directory.getAuthor(),
+                    directory.getAuthor(),
+                    new Date(), new Date(),
+                    State.CREATED);
+            directoryRepository.save(customDirectory);
+            return new DirectoryDto(customDirectory);
+        } else {
+            throw new DirectoryNotFoundException("parent directory not found");
+        }
     }
 
     @Override
