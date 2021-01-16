@@ -1,2 +1,9 @@
 rootProject.name = 'nure-helper'
 
+include 'forms-library'
+
+include 'eureka-server'
+
+// Services
+include 'files-manager-service'
+include 'meta-info-service'

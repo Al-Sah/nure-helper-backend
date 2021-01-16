@@ -10,7 +10,6 @@ sourceCompatibility = '11'
 
 repositories {
     mavenCentral()
-    maven { url 'https://repo.spring.io/milestone' }
 }
 
 ext {
@@ -18,8 +17,11 @@ ext {
 }
 
 dependencies {
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.cloud:spring-cloud-starter-feign:1.4.7.RELEASE'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation project(':forms-library')
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
