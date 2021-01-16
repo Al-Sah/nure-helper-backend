@@ -5,6 +5,7 @@ import devs.nure.metainfoservice.forms.CreateDirectory;
 import devs.nure.metainfoservice.forms.ChangeStatusDirectory;
 import devs.nure.metainfoservice.forms.DirectoryNode;
 import devs.nure.metainfoservice.forms.UpdateDirectory;
+import devs.nure.metainfoservice.models.State;
 import devs.nure.metainfoservice.resource.ErrorMessage;
 import devs.nure.metainfoservice.services.DirectoryService;
 import org.springframework.http.HttpStatus;
@@ -31,14 +32,15 @@ public class DirectoryController {
     public DirectoryDto updateDirectory(@Valid @RequestBody UpdateDirectory directory) {
         return directoryService.updateDirectory(directory);
     }
+
     @PutMapping("/recover")
     public void recoverDirectory(@Valid @RequestBody ChangeStatusDirectory recoverDirectory) {
-        directoryService.recoverDirectory(recoverDirectory);
+        directoryService.setStatusDirectory(recoverDirectory, State.RECOVERED);
     }
 
     @DeleteMapping("/")
     public void removeDirectory(@Valid @RequestBody ChangeStatusDirectory deleteDirectory){
-        directoryService.removeDirectory(deleteDirectory);
+        directoryService.setStatusDirectory(deleteDirectory, State.DELETED);
     }
 
     @GetMapping("/info/{dirUniqID}")

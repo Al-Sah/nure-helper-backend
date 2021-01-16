@@ -32,22 +32,27 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @Override
     public DirectoryDto addDirectory(CreateDirectory directory) {
-        CustomDirectory customDirectory = new CustomDirectory(
-                directory.getShortName(),
-                directory.getFullName(),
-                UUID.randomUUID().toString(),
-                directory.getParentID(),
-                directory.getDescription(),
-                directory.getAuthor(),
-                directory.getAuthor(),
-                new Date(), new Date(),
-                State.CREATED );
-        directoryRepository.save(customDirectory);
-        return new DirectoryDto(customDirectory);
+        if (directoryRepository.existsByUniqID(directory.getParentID())) {
+            CustomDirectory customDirectory = new CustomDirectory(
+                    directory.getShortName(),
+                    directory.getFullName(),
+                    UUID.randomUUID().toString(),
+                    directory.getParentID(),
+                    directory.getDescription(),
+                    directory.getAuthor(),
+                    directory.getAuthor(),
+                    new Date(), new Date(),
+                    State.CREATED);
+            directoryRepository.save(customDirectory);
+            return new DirectoryDto(customDirectory);
+        } else {
+            throw new DirectoryNotFoundException("parent directory not found");
+        }
     }
 
     @Override
     public DirectoryDto updateDirectory(UpdateDirectory directory) {
+
         CustomDirectory customDirectory = directoryRepository
                 .findByUniqID(directory.getUniqId())
                 .orElseThrow(() -> new DirectoryNotFoundException("directory not found "));
@@ -60,16 +65,6 @@ public class DirectoryServiceImpl implements DirectoryService {
 
         directoryRepository.save(customDirectory);
         return new DirectoryDto(customDirectory);
-    }
-
-    @Override
-    public void removeDirectory(ChangeStatusDirectory deleteDirectory) {
-        CustomDirectory directory =  directoryRepository.findByUniqID(deleteDirectory.getDirectoryId())
-                .orElseThrow(() -> new DirectoryNotFoundException("directory not found "));
-        directory.setState(State.DELETED);
-        directory.setLastModification(new Date());
-        directory.setModificationAuthor(deleteDirectory.getAuthor());
-        directoryRepository.save(directory);
     }
 
     @Override
@@ -97,20 +92,29 @@ public class DirectoryServiceImpl implements DirectoryService {
                 .orElseThrow(() -> new DirectoryNotFoundException("directory not found ")));
         newNode.setData(data);
         newNode.setChildren(new ArrayList<>());
-        List<CustomDirectory> madelDirectories = directoryRepository.findAllByParentID(thisID);
-        for (var element : madelDirectories) {
-            newNode.getChildren().add(generateDirectoriesTree(element.getUniqID()));
+        List<CustomDirectory> modelDirectories = directoryRepository.findAllByParentID(thisID);
+        for (var element : modelDirectories) {
+            if (element.getState()!=State.DELETED) {
+                newNode.getChildren().add(generateDirectoriesTree(element.getUniqID()));
+            }
         }
+
         return newNode;
     }
 
     @Override
-    public void recoverDirectory(ChangeStatusDirectory recoverDirectory) {
-        CustomDirectory directory =  directoryRepository.findByUniqID(recoverDirectory.getDirectoryId())
+    public void setStatusDirectory(ChangeStatusDirectory directory, State state) {
+
+        CustomDirectory customDirectory =  directoryRepository.findByUniqID(directory.getDirectoryId())
                 .orElseThrow(() -> new DirectoryNotFoundException("directory not found "));
-        directory.setState(State.RECOVERED);
-        directory.setLastModification(new Date());
-        directory.setModificationAuthor(recoverDirectory.getAuthor());
-        directoryRepository.save(directory);
+        customDirectory.setState(state);
+        customDirectory.setLastModification(new Date());
+        customDirectory.setModificationAuthor(directory.getAuthor());
+        directoryRepository.save(customDirectory);
+
+        List<CustomDirectory> modelDirectories = directoryRepository.findAllByParentID(directory.getDirectoryId());
+        for (var element : modelDirectories) {
+            setStatusDirectory(new ChangeStatusDirectory(element.getUniqID(), element.getCreationAuthor()), state);
+        }
     }
 }
