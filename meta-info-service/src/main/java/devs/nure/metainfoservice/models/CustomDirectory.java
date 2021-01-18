@@ -10,7 +10,7 @@ import java.util.Date;
 @Entity
 @Data
 @NoArgsConstructor
-public class CustomDirectory {
+public class CustomDirectory{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

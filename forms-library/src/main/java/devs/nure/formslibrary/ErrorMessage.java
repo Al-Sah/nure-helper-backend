@@ -1,4 +1,4 @@
-package devs.nure.metainfoservice.resource;
+package devs.nure.formslibrary;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

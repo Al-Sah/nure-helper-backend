@@ -6,7 +6,7 @@ import devs.nure.metainfoservice.forms.ChangeStatusDirectory;
 import devs.nure.metainfoservice.forms.DirectoryNode;
 import devs.nure.metainfoservice.forms.UpdateDirectory;
 import devs.nure.metainfoservice.models.State;
-import devs.nure.metainfoservice.resource.ErrorMessage;
+import devs.nure.formslibrary.ErrorMessage;
 import devs.nure.metainfoservice.services.DirectoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -15,6 +15,7 @@ import java.util.*;
 @Service
 public class DirectoryServiceImpl implements DirectoryService {
 
+
     private final DirectoryRepository directoryRepository;
     public DirectoryServiceImpl(DirectoryRepository directoryRepository) {
         this.directoryRepository = directoryRepository;
@@ -22,13 +23,20 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     @PostConstruct
     private void rootInit(){
-        CustomDirectory customDirectory = new CustomDirectory(
-                "root", "root",
-                "rootDirStudHelper", null, "",
-                "ROOT","ROOT",
-                new Date(), new Date(), State.CREATED );
-        directoryRepository.save(customDirectory);
+        if(!directoryRepository.existsByUniqID("rootDirStudHelper")) {
+            CustomDirectory customDirectory = new CustomDirectory(
+                    "root", "root",
+                    "rootDirStudHelper", null, "",
+                    "ROOT", "ROOT",
+                    new Date(), new Date(), State.CREATED);
+            directoryRepository.save(customDirectory);
+        }
     }
+
+   /* @Override
+    public boolean isDirectoryExists(String dirUniqID) {
+        return directoryRepository.existsByUniqID(dirUniqID);
+    }*/
 
     @Override
     public DirectoryDto addDirectory(CreateDirectory directory) {

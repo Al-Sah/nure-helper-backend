@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface FeignFilesService {
 
     @PostMapping("api/v1/files/")
-    ResponseEntity<?> addFile(@RequestBody FileInfo file);
+    void addFile(@RequestBody FileInfo file);
 
 }

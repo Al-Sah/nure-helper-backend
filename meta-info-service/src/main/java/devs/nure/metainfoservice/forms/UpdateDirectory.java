@@ -12,8 +12,6 @@ public class UpdateDirectory {
     private String description;
     @NotBlank(message = "uniqId cannot be empty")
     private String uniqId;
-    @NotBlank(message = "uniqId cannot be empty")
+    @NotBlank(message = "modificationAuthor cannot be empty")
     private String modificationAuthor;
-
-
 }
