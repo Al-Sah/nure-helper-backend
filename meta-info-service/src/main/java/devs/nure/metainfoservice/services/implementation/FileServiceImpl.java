@@ -13,11 +13,13 @@ import devs.nure.metainfoservice.repositories.DirectoryRepository;
 import devs.nure.metainfoservice.repositories.FileRepository;
 import devs.nure.metainfoservice.services.FileService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
 
 @Service
+@Transactional
 public class FileServiceImpl implements FileService {
     
     private final FileRepository fileRepository;
@@ -49,15 +51,22 @@ public class FileServiceImpl implements FileService {
     @Override
     public FileDto updateFile(UpdateFile updateFile) {
 
-        CustomFile customFile = fileRepository.findByUniqID(updateFile.getUniqId())
-                .orElseThrow(() -> new FileNotFoundException("file not found"));
-        customFile.setShortName(updateFile.getName());
-        customFile.setModificationAuthor(updateFile.getModificationAuthor());
-        customFile.setLastModification(new Date());
-        customFile.setState(State.UPDATED);
+        if (fileRepository.findByUniqID(updateFile.getUniqId())
+                .orElseThrow(() -> new FileNotFoundException("file not found "))
+                .getState() != State.DELETED) {
 
-        fileRepository.save(customFile);
-        return new FileDto(customFile);
+            CustomFile customFile = fileRepository.findByUniqID(updateFile.getUniqId())
+                    .orElseThrow(() -> new FileNotFoundException("file not found"));
+            customFile.setShortName(updateFile.getName());
+            customFile.setModificationAuthor(updateFile.getModificationAuthor());
+            customFile.setLastModification(new Date());
+            customFile.setState(State.UPDATED);
+
+            fileRepository.save(customFile);
+            return new FileDto(customFile);
+        } else {
+            throw new FileNotFoundException("file's state is 'deleted'");
+        }
     }
 
     @Override
@@ -74,5 +83,14 @@ public class FileServiceImpl implements FileService {
         customFile.setLastModification(new Date());
         customFile.setModificationAuthor(file.getAuthor());
         fileRepository.save(customFile);
+    }
+
+    @Override
+    public void completeDeleteFile(String fileUniqID) {
+        if (fileRepository.existsByUniqID(fileUniqID)) {
+            fileRepository.deleteByUniqID(fileUniqID);
+        } else {
+            throw new FileNotFoundException("file not found");
+        }
     }
 }

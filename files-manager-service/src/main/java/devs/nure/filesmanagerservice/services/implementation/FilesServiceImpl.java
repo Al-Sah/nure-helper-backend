@@ -36,4 +36,9 @@ public class FilesServiceImpl implements FilesService {
     public FileInfo manageFile(MultipartFile file, CreateFile createFile) {
         return saveFileMetaInfo(file, createFile);
     }
+
+//    @Override
+//    public FileInfo showFileInfo(String fileID) {
+//        return filesService.showFileInfo(fileID);
+//    }
 }

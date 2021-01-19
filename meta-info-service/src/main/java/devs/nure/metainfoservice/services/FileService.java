@@ -11,4 +11,5 @@ public interface FileService {
     FileDto updateFile(UpdateFile updateFile);
     FileDto showFileInfo(String fileUniqID);
     void setStatusFile(ChangeStatusFile file, State state);
+    void completeDeleteFile(String fileUniqID);
 }

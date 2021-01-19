@@ -43,6 +43,11 @@ public class DirectoryController {
         directoryService.setStatusDirectory(deleteDirectory, State.DELETED);
     }
 
+    @DeleteMapping("/complete_remove")
+    public void completeRemoveDirectory(@RequestParam("dirUniqID") String dirUniqID) {
+        directoryService.completeDeleteDirectory(dirUniqID);
+    }
+
     @GetMapping("/info/{dirUniqID}")
     public DirectoryDto showDirectoryDescription(@PathVariable String dirUniqID) {
         return directoryService.showDirectoryDescription(dirUniqID);

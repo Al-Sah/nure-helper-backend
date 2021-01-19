@@ -1,6 +1,5 @@
 package devs.nure.metainfoservice.models;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

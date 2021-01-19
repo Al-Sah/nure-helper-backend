@@ -30,6 +30,11 @@ public class FilesController {
         return fileService.updateFile(file);
     }
 
+    @DeleteMapping("/complete_remove")
+    public void completeRemoveFile(@Valid @RequestBody String fileUniqID) { // ???
+        fileService.completeDeleteFile(fileUniqID);
+    }
+
     @DeleteMapping("/")
     public void deleteFile(@Valid @RequestBody ChangeStatusFile deleteFile) {
         fileService.setStatusFile(deleteFile, State.DELETED);

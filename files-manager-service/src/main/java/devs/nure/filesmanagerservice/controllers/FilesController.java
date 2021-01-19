@@ -32,6 +32,11 @@ public class FilesController {
         return null;
     }
 
+//    @GetMapping("/info/{fileID}")
+//    public FileInfo showFileInfo(@PathVariable String fileID) {
+//        return null;
+//    }
+
 
     @ExceptionHandler
     public ResponseEntity<ErrorMessage> handleException(RuntimeException exception) {

@@ -12,5 +12,6 @@ public interface DirectoryService {
     DirectoryNode showDirectory(String dirUniqID);
     TreeNode generateDirectoriesTree(String dirUniqID);
     void setStatusDirectory(ChangeStatusDirectory directory, State state);
+    void completeDeleteDirectory(String dirUniqID);
 //    boolean isDirectoryExists(String dirUniqID);
 }

@@ -1,6 +1,7 @@
 package devs.nure.metainfoservice.forms;
 
 import devs.nure.metainfoservice.Dto.DirectoryDto;
+import devs.nure.metainfoservice.Dto.FileDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,6 @@ public class DirectoryNode {
 
     private DirectoryDto directoryData;
     private List<DirectoryDto> directories;
+    private List<FileDto> files;
 
-
-    //private List<FilesDto> files;
 }

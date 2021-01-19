@@ -7,5 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 public interface FilesService {
 
     FileInfo saveFileMetaInfo(MultipartFile file, CreateFile createFile);
+//    FileInfo showFileInfo(String fileID);
     FileInfo manageFile(MultipartFile file, CreateFile createFile);
 }

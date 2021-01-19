@@ -2,6 +2,7 @@ package devs.nure.metainfoservice.models;
 
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,20 +12,21 @@ import java.util.Date;
 
 @Entity
 @Data
+@NoArgsConstructor
 public class CustomFile{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    protected String shortName;
-    protected String uniqID;
-    protected String parentID;
-    protected String creationAuthor;
-    protected String modificationAuthor;
-    protected Date created;
-    protected Date lastModification;
-    protected State state;
+    private String shortName;
+    private String uniqID;
+    private String parentID;
+    private String creationAuthor;
+    private String modificationAuthor;
+    private Date created;
+    private Date lastModification;
+    private State state;
 
     public CustomFile(
             String name, String uniqID, String parentID,

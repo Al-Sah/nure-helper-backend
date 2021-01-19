@@ -1,24 +1,35 @@
 package devs.nure.metainfoservice.services.implementation;
 
+import devs.nure.formslibrary.ChangeStatusFile;
 import devs.nure.metainfoservice.Dto.DirectoryDto;
+import devs.nure.metainfoservice.Dto.FileDto;
 import devs.nure.metainfoservice.forms.*;
 import devs.nure.metainfoservice.models.CustomDirectory;
+import devs.nure.metainfoservice.models.CustomFile;
 import devs.nure.metainfoservice.models.State;
 import devs.nure.metainfoservice.exceptions.*;
 import devs.nure.metainfoservice.repositories.DirectoryRepository;
+import devs.nure.metainfoservice.repositories.FileRepository;
 import devs.nure.metainfoservice.services.DirectoryService;
+import devs.nure.metainfoservice.services.FileService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
 
 @Service
+@Transactional
 public class DirectoryServiceImpl implements DirectoryService {
 
 
     private final DirectoryRepository directoryRepository;
-    public DirectoryServiceImpl(DirectoryRepository directoryRepository) {
+    private final FileRepository fileRepository;
+    private final FileService fileService;
+    public DirectoryServiceImpl(DirectoryRepository directoryRepository, FileRepository fileRepository, FileService fileService) {
         this.directoryRepository = directoryRepository;
+        this.fileRepository = fileRepository;
+        this.fileService = fileService;
     }
 
     @PostConstruct
@@ -32,11 +43,6 @@ public class DirectoryServiceImpl implements DirectoryService {
             directoryRepository.save(customDirectory);
         }
     }
-
-   /* @Override
-    public boolean isDirectoryExists(String dirUniqID) {
-        return directoryRepository.existsByUniqID(dirUniqID);
-    }*/
 
     @Override
     public DirectoryDto addDirectory(CreateDirectory directory) {
@@ -61,18 +67,23 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     public DirectoryDto updateDirectory(UpdateDirectory directory) {
 
-        CustomDirectory customDirectory = directoryRepository
-                .findByUniqID(directory.getUniqId())
-                .orElseThrow(() -> new DirectoryNotFoundException("directory not found "));
-        customDirectory.setShortName(directory.getShortName());
-        customDirectory.setFullName(directory.getFullName());
-        customDirectory.setDescription(directory.getDescription());
-        customDirectory.setModificationAuthor(directory.getModificationAuthor());
-        customDirectory.setLastModification(new Date());
-        customDirectory.setState(State.UPDATED);
+        if (directoryRepository.findByUniqID(directory.getUniqId())
+                .orElseThrow(() -> new DirectoryNotFoundException("directory not found ")) // if obj exists
+                .getState() != State.DELETED) {                                            // if state != DELETED
 
-        directoryRepository.save(customDirectory);
-        return new DirectoryDto(customDirectory);
+            CustomDirectory customDirectory = directoryRepository.findByUniqID(directory.getUniqId()).get();
+            customDirectory.setShortName(directory.getShortName());
+            customDirectory.setFullName(directory.getFullName());
+            customDirectory.setDescription(directory.getDescription());
+            customDirectory.setModificationAuthor(directory.getModificationAuthor());
+            customDirectory.setLastModification(new Date());
+            customDirectory.setState(State.UPDATED);
+
+            directoryRepository.save(customDirectory);
+            return new DirectoryDto(customDirectory);
+        } else {
+            throw new DirectoryNotFoundException("directory's state is 'deleted'");
+        }
     }
 
     @Override
@@ -85,12 +96,25 @@ public class DirectoryServiceImpl implements DirectoryService {
     public DirectoryNode showDirectory(String dirUniqID) {
         DirectoryDto dirData = new DirectoryDto(directoryRepository.findByUniqID(dirUniqID)
                 .orElseThrow(() -> new DirectoryNotFoundException("directory not found ")));
-        List<CustomDirectory> madelDirectories = directoryRepository.findAllByParentID(dirData.getUniqID());
+
+        List<CustomDirectory> modelDirectories = directoryRepository.findAllByParentID(dirData.getUniqID());
+        List<CustomFile> modelFiles = fileRepository.findAllByParentID(dirData.getUniqID());
         List<DirectoryDto> directoryDtos = new LinkedList<>();
-        for (var element: madelDirectories) {
-            directoryDtos.add(new DirectoryDto(element));
+        List<FileDto> fileDtos = new LinkedList<>();
+
+        for (var element: modelDirectories) {
+//            if(element.getState()!= State.DELETED) {
+                directoryDtos.add(new DirectoryDto(element));
+//            }
         }
-        return new DirectoryNode(dirData, directoryDtos);
+
+        for (var element : modelFiles) {
+//            if(element.getState()!= State.DELETED) {
+                fileDtos.add(new FileDto(element));
+//            }
+        }
+
+        return new DirectoryNode(dirData, directoryDtos, fileDtos);
     }
 
     @Override
@@ -121,8 +145,25 @@ public class DirectoryServiceImpl implements DirectoryService {
         directoryRepository.save(customDirectory);
 
         List<CustomDirectory> modelDirectories = directoryRepository.findAllByParentID(directory.getDirectoryId());
+        List<CustomFile> modelFiles = fileRepository.findAllByParentID(directory.getDirectoryId());
+
         for (var element : modelDirectories) {
             setStatusDirectory(new ChangeStatusDirectory(element.getUniqID(), element.getCreationAuthor()), state);
         }
+
+        for (var element : modelFiles) {
+            fileService.setStatusFile(new ChangeStatusFile(element.getUniqID(), element.getCreationAuthor()), state);
+        }
+
     }
+
+    @Override
+    public void completeDeleteDirectory(String dirUniqID) {
+        if (directoryRepository.existsByUniqID(dirUniqID)) {
+            directoryRepository.deleteByUniqID(dirUniqID);
+        } else {
+            throw new DirectoryNotFoundException("directory not found");
+        }
+    }
+
 }
