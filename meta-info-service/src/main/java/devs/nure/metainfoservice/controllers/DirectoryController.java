@@ -35,12 +35,12 @@ public class DirectoryController {
 
     @PutMapping("/recover")
     public void recoverDirectory(@Valid @RequestBody ChangeStatusDirectory recoverDirectory) {
-        directoryService.setStatusDirectory(recoverDirectory, State.RECOVERED);
+        directoryService.setDirectoryState(recoverDirectory, State.RECOVERED);
     }
 
     @DeleteMapping("/")
     public void removeDirectory(@Valid @RequestBody ChangeStatusDirectory deleteDirectory){
-        directoryService.setStatusDirectory(deleteDirectory, State.DELETED);
+        directoryService.removeDirectory(deleteDirectory);
     }
 
     @DeleteMapping("/complete_remove")
@@ -48,7 +48,7 @@ public class DirectoryController {
         directoryService.completeDeleteDirectory(dirUniqID);
     }
 
-    @GetMapping("/info/{dirUniqID}")
+    @GetMapping("/{dirUniqID}/info")
     public DirectoryDto showDirectoryDescription(@PathVariable String dirUniqID) {
         return directoryService.showDirectoryDescription(dirUniqID);
     }

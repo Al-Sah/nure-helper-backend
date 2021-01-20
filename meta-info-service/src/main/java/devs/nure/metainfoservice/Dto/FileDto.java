@@ -12,6 +12,7 @@ public class FileDto {
     private String parentID;
     private String creationAuthor;
     private String modificationAuthor;
+    private String contentType;
     private Date created;
     private Date lastModification;
     private String state; // state == type of modification
@@ -22,6 +23,7 @@ public class FileDto {
         this.parentID = file.getParentID();
         this.creationAuthor = file.getCreationAuthor();
         this.modificationAuthor = file.getModificationAuthor();
+        this.contentType = file.getContentType();
         this.created = file.getCreated();
         this.lastModification = file.getLastModification();
         this.state = file.getState().toString();

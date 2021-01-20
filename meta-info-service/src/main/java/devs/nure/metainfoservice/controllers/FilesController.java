@@ -4,12 +4,14 @@ import devs.nure.formslibrary.*;
 import devs.nure.metainfoservice.Dto.FileDto;
 import devs.nure.metainfoservice.models.State;
 import devs.nure.metainfoservice.services.FileService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("api/v1/files")
+@RequestMapping("/api/v1/files")
 public class FilesController {
 
     private final FileService fileService;
@@ -18,11 +20,9 @@ public class FilesController {
         this.fileService = fileService;
     }
 
-
-    @PostMapping("/")
+    @PostMapping("/") //is used by files-manager service
     public void addFile(@RequestBody FileInfo file){
          fileService.addFile(file);
-
     }
 
     @PutMapping("/")
@@ -30,19 +30,19 @@ public class FilesController {
         return fileService.updateFile(file);
     }
 
-    @DeleteMapping("/complete_remove")
-    public void completeRemoveFile(@Valid @RequestBody String fileUniqID) { // ???
+    @DeleteMapping("/complete_remove") //is used by files-manager service
+    public void completeRemoveFile(@Valid @RequestBody String fileUniqID) {
         fileService.completeDeleteFile(fileUniqID);
     }
 
     @DeleteMapping("/")
     public void deleteFile(@Valid @RequestBody ChangeStatusFile deleteFile) {
-        fileService.setStatusFile(deleteFile, State.DELETED);
+        fileService.setFileState(deleteFile, State.DELETED);
     }
 
     @PutMapping("/recover")
     public void recoverFile(@Valid @RequestBody ChangeStatusFile recoverFile) {
-        fileService.setStatusFile(recoverFile, State.RECOVERED);
+        fileService.setFileState(recoverFile, State.RECOVERED);
     }
 
     @GetMapping("/{fileID}/info")
@@ -50,6 +50,9 @@ public class FilesController {
         return fileService.showFileInfo(fileID);
     }
 
-
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessage> handleException(RuntimeException exception) {
+        return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), HttpStatus.BAD_REQUEST);
+    }
 
 }

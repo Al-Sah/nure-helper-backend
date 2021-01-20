@@ -12,6 +12,7 @@ public interface FileRepository extends JpaRepository<CustomFile, Long> {
 
     Optional<CustomFile> findByUniqID(String uniqId);
     boolean existsByUniqID(String uniqId);
-    void deleteByUniqID(String uniqId);
+    void removeCustomFileByUniqID(String uniqId);
+    void deleteAllByParentID(String uniqId);
     List<CustomFile> findAllByParentID(String uniqID);
 }

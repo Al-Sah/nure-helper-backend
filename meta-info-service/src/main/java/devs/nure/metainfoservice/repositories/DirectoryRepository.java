@@ -12,7 +12,7 @@ public interface DirectoryRepository extends JpaRepository<CustomDirectory, Long
 
      Optional <CustomDirectory> findByUniqID(String uniqId);
      boolean existsByUniqID(String uniqId);
-     void deleteByUniqID(String uniqId);
+     void removeCustomDirectoryByUniqID(String uniqId);
      List<CustomDirectory> findAllByParentID(String uniqID);
 }
 

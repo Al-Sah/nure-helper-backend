@@ -24,13 +24,14 @@ public class CustomFile{
     private String parentID;
     private String creationAuthor;
     private String modificationAuthor;
+    private String contentType;
     private Date created;
     private Date lastModification;
     private State state;
 
     public CustomFile(
             String name, String uniqID, String parentID,
-            String creationAuthor, String modificationAuthor,
+            String creationAuthor, String modificationAuthor, String contentType,
             Date created, Date lastModification, State state){
 
         this.shortName = name;
@@ -38,6 +39,7 @@ public class CustomFile{
         this.parentID = parentID;
         this.creationAuthor = creationAuthor;
         this.modificationAuthor = modificationAuthor;
+        this.contentType = contentType;
         this.created = created;
         this.lastModification = lastModification;
         this.state = state;
