@@ -1,0 +1,23 @@
+{
+  "properties": [
+    {
+      "name": "meta-info.deleted-dir-node.show-nested-files",
+      "type": "java.lang.Boolean",
+      "description": "Description for meta-info.dir-node.show-nested-files."
+    },
+    {
+      "name": "meta-info.deleted-dir-node.show-nested-directories",
+      "type": "java.lang.Boolean",
+      "description": "Description for meta-info.dir-node.show-nested-directories."
+    },
+    {
+      "name": "meta-info.root-dir.name",
+      "type": "java.lang.String",
+      "description": "Description for meta-info.root-dir.name."
+    },
+    {
+      "name": "meta-info.root-dir.id",
+      "type": "java.lang.String",
+      "description": "Description for meta-info.root-dir.id."
+    }
+  ] }
