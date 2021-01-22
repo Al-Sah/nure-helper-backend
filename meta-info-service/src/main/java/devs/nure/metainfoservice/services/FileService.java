@@ -11,10 +11,11 @@ import java.util.List;
 
 public interface FileService {
     void addFile(FileInfo file);
-    FileDto updateFile(UpdateFile updateFile);
+    void updateFile(UpdateFile updateFile);
     FileDto showFileInfo(String fileUniqID);
     void deleteFilesInfo(String directoryID);
     void setFileState(ChangeStatusFile file, State state);
     void completeDeleteFile(String fileUniqID);
     List<CustomFile> getFilesByParentID(String uniqID);
+    FileInfo getFileInfo(String fileUniqID); // used by files manager
 }

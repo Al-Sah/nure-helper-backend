@@ -13,9 +13,12 @@ public interface FeignStorageServer {
 
 
     @PostMapping(value="/storage/", consumes = "multipart/form-data" )
-    String storeFile(@RequestPart("file") MultipartFile file);
+    String storeFile(@RequestPart("file") MultipartFile file, @RequestPart("uniqID") String uniqID);
 
     @GetMapping("/storage/{location}")
     ResponseEntity<Resource> getFile(@PathVariable String location);
+
+    @DeleteMapping("/storage/")
+    void deleteFile(@RequestBody String fileName) ;
 
 }

@@ -52,7 +52,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FileDto updateFile(UpdateFile updateFile) {
+    public void updateFile(UpdateFile updateFile) {
         CustomFile customFile = findByUUID(updateFile.getUniqId());
         if (customFile.getState() != State.DELETED) {
             customFile.setShortName(updateFile.getName());
@@ -61,7 +61,6 @@ public class FileServiceImpl implements FileService {
             customFile.setState(State.UPDATED);
 
             fileRepository.save(customFile);
-            return new FileDto(customFile);
         } else {
             throw new RuntimeException("File's state is 'deleted'");
         }
@@ -69,6 +68,9 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileDto showFileInfo(String fileUniqID) {
+        if (findByUUID(fileUniqID).getState() == State.DELETED) {
+            throw new FileNotFoundException("File with ID [" + fileUniqID + "] has state 'DELETED'");
+        }
         return new FileDto(findByUUID(fileUniqID));
     }
 
@@ -94,5 +96,21 @@ public class FileServiceImpl implements FileService {
     @Override
     public List<CustomFile> getFilesByParentID(String uniqID) {
         return fileRepository.findAllByParentID(uniqID);
+    }
+
+    @Override
+    public FileInfo getFileInfo(String fileUniqID) {   // used by files manager
+        FileDto fileDto = showFileInfo(fileUniqID);
+        return new FileInfo(
+                fileDto.getName(),
+                fileDto.getContentType(),
+                fileUniqID,
+                fileDto.getParentID(),
+                fileDto.getCreationAuthor(),
+                fileDto.getModificationAuthor(),
+                fileDto.getCreated(),
+                fileDto.getLastModification(),
+                fileDto.getState()
+        );
     }
 }

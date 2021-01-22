@@ -5,6 +5,7 @@ import devs.nure.metainfoservice.Dto.FileDto;
 import devs.nure.metainfoservice.models.State;
 import devs.nure.metainfoservice.services.FileService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,13 +27,13 @@ public class FilesController {
     }
 
     @PutMapping("/")
-    public FileDto updateFile(@Valid @RequestBody UpdateFile file){
-        return fileService.updateFile(file);
+    public void updateFile(@Valid @RequestBody UpdateFile file){
+        fileService.updateFile(file);
     }
 
     @DeleteMapping("/complete_remove") //is used by files-manager service
-    public void completeRemoveFile(@Valid @RequestBody String fileUniqID) {
-        fileService.completeDeleteFile(fileUniqID);
+    public void completeRemoveFile(@Valid @RequestBody String fileId) {
+        fileService.completeDeleteFile(fileId);
     }
 
     @DeleteMapping("/")
@@ -48,6 +49,11 @@ public class FilesController {
     @GetMapping("/{fileID}/info")
     public FileDto showFileInfo(@PathVariable String fileID){
         return fileService.showFileInfo(fileID);
+    }
+
+    @GetMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)        // used by files manager
+    public FileInfo getFileInfo(@Valid @RequestBody String fileID) {
+        return fileService.getFileInfo(fileID);
     }
 
     @ExceptionHandler

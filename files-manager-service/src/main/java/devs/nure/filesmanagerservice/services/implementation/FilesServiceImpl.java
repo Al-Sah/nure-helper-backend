@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.Date;
 import java.util.UUID;
 
@@ -39,17 +40,39 @@ public class FilesServiceImpl implements FilesService {
     @Override
     public FileInfo manageFile(MultipartFile file, CreateFile createFile) {
         FileInfo fileInfo = saveFileMetaInfo(file, createFile);
-        storeFile(file);
+        storeFile(file, fileInfo.getUniqId());
         return fileInfo;
     }
 
     @Override
-    public void storeFile(MultipartFile file) {
-        storageServer.storeFile(file);
+    public void storeFile(MultipartFile file, String uniqID) {
+        storageServer.storeFile(file, uniqID);
     }
+
+//    @Override
+//    public void deleteFile(ChangeStatusFile file) {
+//        filesService.deleteFile(new ChangeStatusFile(file.getFileId(), file.getAuthor()));
+//    }
+//
+//    @Override
+//    public void recoverFile(ChangeStatusFile file) {
+//        filesService.recoverFile(new ChangeStatusFile(file.getFileId(), file.getAuthor()));
+//    }
 
     @Override
     public ResponseEntity<Resource> downloadFile(String location) {
         return storageServer.getFile(location);
+    }
+
+
+    @Override
+    public FileInfo getFileInfo(String fileID) {
+        return filesService.getFileInfo(fileID);
+    }
+
+    @Override
+    public void completeRemoveFile(String fileId) {
+        storageServer.deleteFile(fileId);
+        filesService.completeRemoveFile(fileId);
     }
 }

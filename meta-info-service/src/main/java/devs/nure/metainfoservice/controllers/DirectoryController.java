@@ -44,7 +44,7 @@ public class DirectoryController {
     }
 
     @DeleteMapping("/complete_remove")
-    public void completeRemoveDirectory(@RequestParam("dirUniqID") String dirUniqID) {
+    public void completeRemoveDirectory(@RequestBody String dirUniqID) {
         directoryService.completeDeleteDirectory(dirUniqID);
     }
 
