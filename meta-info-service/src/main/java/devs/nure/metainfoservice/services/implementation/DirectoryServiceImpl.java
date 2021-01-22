@@ -2,6 +2,8 @@ package devs.nure.metainfoservice.services.implementation;
 
 import devs.nure.formslibrary.ChangeStatusFile;
 import devs.nure.metainfoservice.Dto.*;
+import devs.nure.metainfoservice.configuration.DeletedDirectoryNodeConfiguration;
+import devs.nure.metainfoservice.configuration.RootDirectoryConfiguration;
 import devs.nure.metainfoservice.forms.*;
 import devs.nure.metainfoservice.models.*;
 import devs.nure.metainfoservice.exceptions.*;
@@ -18,10 +20,21 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     private final DirectoryRepository directoryRepository;
     private final FileService fileService;
+    private final boolean showDirectories;
+    private final boolean showFiles;
+    private final String rootDirectoryName;
+    private final String rootDirectoryID;
 
-    public DirectoryServiceImpl(DirectoryRepository directoryRepository, FileService fileService) {
+    public DirectoryServiceImpl(DirectoryRepository directoryRepository,
+                                FileService fileService,
+                                DeletedDirectoryNodeConfiguration node,
+                                RootDirectoryConfiguration rootConfig) {
         this.directoryRepository = directoryRepository;
         this.fileService = fileService;
+        this.showFiles = node.getShow_nested_files();
+        this.showDirectories = node.getShow_nested_directories();
+        this.rootDirectoryName = rootConfig.getName();
+        this.rootDirectoryID = rootConfig.getId();
     }
 
     private CustomDirectory findByUUID(String uniqId){
@@ -30,13 +43,11 @@ public class DirectoryServiceImpl implements DirectoryService {
     }
 
     @PostConstruct
-    private void rootInit(){ // TODO configuration
-        if(!directoryRepository.existsByUniqID("rootDirStudHelper")) {
+    private void rootInit(){
+        if(!directoryRepository.existsByUniqID(rootDirectoryID)) {
             CustomDirectory customDirectory = new CustomDirectory(
-                    "root", "root",
-                    "rootDirStudHelper", null, "",
-                    "ROOT", "ROOT",
-                    new Date(), new Date(), State.CREATED);
+                    rootDirectoryName, rootDirectoryName, rootDirectoryID, null, "",
+                    rootDirectoryName, rootDirectoryName, new Date(), new Date(), State.CREATED);
             directoryRepository.save(customDirectory);
         }
     }
@@ -87,16 +98,18 @@ public class DirectoryServiceImpl implements DirectoryService {
     @Override
     public DirectoryNode showDirectory(String dirUniqID) {
         DirectoryDto dirData = new DirectoryDto( findByUUID(dirUniqID) );
-
+        String dirState = dirData.getState();
         List<CustomDirectory> modelDirectories = directoryRepository.findAllByParentID(dirData.getUniqID());
         List<CustomFile> modelFiles = fileService.getFilesByParentID(dirData.getUniqID());
         List<DirectoryDto> directoryDtos = new LinkedList<>();
         List<FileDto> fileDtos = new LinkedList<>();
 
-        if(!dirData.getState().equals(State.DELETED.toString())){ // TODO configuration
+        if(!dirState.equals("DELETED") || showDirectories){
             for (var element: modelDirectories) {
                 directoryDtos.add(new DirectoryDto(element));
             }
+        }
+        if(!dirState.equals("DELETED") || showFiles) {
             for (var element : modelFiles) {
                 fileDtos.add(new FileDto(element));
             }
