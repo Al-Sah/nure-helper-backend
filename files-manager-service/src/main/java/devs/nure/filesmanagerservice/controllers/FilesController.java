@@ -3,12 +3,11 @@ package devs.nure.filesmanagerservice.controllers;
 import devs.nure.filesmanagerservice.services.FilesService;
 import devs.nure.formslibrary.*;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/files")
@@ -20,38 +19,30 @@ public class FilesController {
     }
 
     @PostMapping(value = "/save", consumes = "multipart/form-data" )
-    public FileInfo saveFile(@RequestParam("file") MultipartFile file, @RequestParam("author") String author,
+    public FileInfo saveFile(@RequestParam("file") MultipartFile file,
+                             @RequestParam("author") String author,
                              @RequestParam("parentID") String parentID){
         return filesService.manageFile(file, new CreateFile(parentID, author));
     }
 
     @GetMapping("/{fileID}")
     public ResponseEntity<Resource> uploadFile(@PathVariable String fileID){
-        return filesService.downloadFile(fileID);
+        Resource resource = filesService.downloadFile(fileID);
+        FileInfo info = filesService.getFileInfo(fileID);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + info.getName() + "\"")
+                .header(HttpHeaders.CONTENT_TYPE, info.getContentType())
+                .header(HttpHeaders.LAST_MODIFIED, info.getLastModification().toString())
+                .body(resource);
     }
 
-//    @DeleteMapping("/")
-//    public void deleteFile(@RequestBody ChangeStatusFile file) {
-//        filesService.deleteFile(file);
-//    }
-//
-//    @PutMapping("/recover")
-//    void recoverFile(@RequestBody ChangeStatusFile file) {
-//        filesService.recoverFile(file);
-//    }
-
-    @GetMapping("/")
-    public FileInfo getFileInfo(@Valid @RequestBody String fileID) {
-        return filesService.getFileInfo(fileID);
-    }
-
-    @DeleteMapping("/complete_remove")
-    public void completeRemoveFile(@RequestBody String fileId) {
-        filesService.completeRemoveFile(fileId);
+    @DeleteMapping("/remove")
+    public void removeFile(@RequestParam("fileId") String fileId) {
+        filesService.removeFile(fileId);
     }
 
 
-    @ExceptionHandler
+    @ExceptionHandler // TODO ControllerAdvice
     public ResponseEntity<ErrorMessage> handleException(RuntimeException exception) {
         return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), HttpStatus.BAD_REQUEST);
     }

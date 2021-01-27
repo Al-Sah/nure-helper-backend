@@ -5,7 +5,6 @@ import devs.nure.metainfoservice.Dto.FileDto;
 import devs.nure.metainfoservice.models.State;
 import devs.nure.metainfoservice.services.FileService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,7 +50,7 @@ public class FilesController {
         return fileService.showFileInfo(fileID);
     }
 
-    @GetMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)        // used by files manager
+    @GetMapping("/")// used by files manager
     public FileInfo getFileInfo(@Valid @RequestBody String fileID) {
         return fileService.getFileInfo(fileID);
     }
