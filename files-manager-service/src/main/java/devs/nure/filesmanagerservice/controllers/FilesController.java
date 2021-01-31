@@ -30,7 +30,7 @@ public class FilesController {
         Resource resource = filesService.downloadFile(fileID);
         FileInfo info = filesService.getFileInfo(fileID);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + info.getName() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" +info.getName() + "\"")
                 .header(HttpHeaders.CONTENT_TYPE, info.getContentType())
                 .header(HttpHeaders.LAST_MODIFIED, info.getLastModification().toString())
                 .body(resource);
@@ -41,9 +41,4 @@ public class FilesController {
         filesService.removeFile(fileId);
     }
 
-
-    @ExceptionHandler // TODO ControllerAdvice
-    public ResponseEntity<ErrorMessage> handleException(RuntimeException exception) {
-        return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), HttpStatus.BAD_REQUEST);
-    }
 }

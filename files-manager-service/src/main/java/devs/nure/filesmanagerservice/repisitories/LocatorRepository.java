@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface LocatorRepository extends JpaRepository<Locator, Long> {
 
-    Optional<Locator> findByChecksum(String checksum);
+    Optional<Locator> findFirstByChecksum(String checksum);
     boolean existsByChecksum(String checksum);
     Optional<Locator> findByFileMetaInfoUUID(String fileID);
     List<Locator> findAllByChecksum(String checksum);

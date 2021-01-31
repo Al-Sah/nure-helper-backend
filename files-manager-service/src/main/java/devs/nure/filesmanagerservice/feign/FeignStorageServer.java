@@ -1,6 +1,5 @@
 package devs.nure.filesmanagerservice.feign;
 
-import devs.nure.filesmanagerservice.forms.StoredFile;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;

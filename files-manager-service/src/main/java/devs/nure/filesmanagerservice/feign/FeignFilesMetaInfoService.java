@@ -2,6 +2,7 @@ package devs.nure.filesmanagerservice.feign;
 
 import devs.nure.formslibrary.FileInfo;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -12,7 +13,8 @@ public interface FeignFilesMetaInfoService {
     @PostMapping("/api/v1/files/")
     void sendFileInformation(@RequestBody FileInfo file);
 
-    @GetMapping("/api/v1/files/")
+    @GetMapping(value = "/api/v1/files/", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
     FileInfo getFileInfo(@Valid @RequestBody String fileID);
 
     @DeleteMapping("/api/v1/files/complete_remove")
