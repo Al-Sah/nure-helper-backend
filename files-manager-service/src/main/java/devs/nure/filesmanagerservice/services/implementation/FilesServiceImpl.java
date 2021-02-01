@@ -9,10 +9,12 @@ import devs.nure.filesmanagerservice.services.FilesService;
 import devs.nure.formslibrary.*;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -129,7 +131,7 @@ public class FilesServiceImpl implements FilesService {
             log.error(exception.getMessage());
         }
         Locator locator = locatorRepository.findByFileMetaInfoUUID(fileID).orElseThrow(() -> new FileNotFoundException(fileID));
-        return new FileInfo("document", locator.getContentType(),fileID,"missed","missed","missed",new Date(), new Date(), "GENERATED");
+        return new FileInfo("document", locator.getContentType(), fileID,"missed","missed","missed",new Date(), new Date(), "GENERATED");
     }
 
     @Override
@@ -146,6 +148,11 @@ public class FilesServiceImpl implements FilesService {
 
     @Override
     public String getChecksum(MultipartFile file) {
-        return Long.toString(file.getSize()); // TODO calc Checksum
+        try {
+            return DigestUtils.sha256Hex(file.getBytes());
+        } catch (IOException e) {
+            log.error("Cannot use sha256Hex (will be used \"size+content\"). Exception is: {}", e.getMessage());
+        }
+        return file.getSize() + file.getContentType();
     }
 }
