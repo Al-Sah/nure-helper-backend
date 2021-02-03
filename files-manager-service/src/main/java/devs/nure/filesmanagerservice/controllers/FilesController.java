@@ -1,12 +1,9 @@
 package devs.nure.filesmanagerservice.controllers;
 
 import devs.nure.filesmanagerservice.services.FilesService;
-import devs.nure.formslibrary.CreateFile;
-import devs.nure.formslibrary.ErrorMessage;
-import devs.nure.formslibrary.FileInfo;
+import devs.nure.formslibrary.*;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +29,16 @@ public class FilesController {
         Resource resource = filesService.downloadFile(fileID);
         FileInfo info = filesService.getFileInfo(fileID);
         return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, info.getContentType())
+                .header(HttpHeaders.LAST_MODIFIED, info.getLastModification().toString())
+                .body(resource);
+    }
+
+    @GetMapping("/{fileID}/download")
+    public ResponseEntity<Resource> uploadFileAsAttachment(@PathVariable String fileID){
+        Resource resource = filesService.downloadFile(fileID);
+        FileInfo info = filesService.getFileInfo(fileID);
+        return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" +info.getName() + "\"")
                 .header(HttpHeaders.CONTENT_TYPE, info.getContentType())
                 .header(HttpHeaders.LAST_MODIFIED, info.getLastModification().toString())
@@ -43,9 +50,4 @@ public class FilesController {
         filesService.removeFile(fileId);
     }
 
-
-    @ExceptionHandler // TODO ControllerAdvice
-    public ResponseEntity<ErrorMessage> handleException(RuntimeException exception) {
-        return new ResponseEntity<>(new ErrorMessage(exception.getMessage()), HttpStatus.BAD_REQUEST);
-    }
 }
