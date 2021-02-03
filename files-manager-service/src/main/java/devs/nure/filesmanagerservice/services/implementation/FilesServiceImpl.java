@@ -1,5 +1,6 @@
 package devs.nure.filesmanagerservice.services.implementation;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import devs.nure.filesmanagerservice.exceptions.*;
 import devs.nure.filesmanagerservice.feign.*;
 import devs.nure.filesmanagerservice.forms.StoredFile;
@@ -10,17 +11,26 @@ import devs.nure.formslibrary.*;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.cloud.netflix.hystrix.EnableHystrix;
+import org.springframework.core.io.AbstractResource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
+@EnableHystrix
 @Service
 public class FilesServiceImpl implements FilesService {
 
@@ -116,10 +126,38 @@ public class FilesServiceImpl implements FilesService {
         return storedFile;
     }
 
+    @HystrixCommand(fallbackMethod = "downloadFileFallbackMethod")
     @Override
     public Resource downloadFile(String fileID) {
         Locator locator = locatorRepository.findByFileMetaInfoUUID(fileID).orElseThrow(() -> new FileNotFoundException(fileID));
         return storageServer.getFile(locator.getPath());
+    }
+
+    public Resource downloadFileFallbackMethod(String fileID) {
+
+        /*return new AbstractResource() {
+            @Override
+            public String getDescription() {
+                return null;
+            }
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return new ByteArrayInputStream(
+                        ("this is fallback\n" + HttpStatus.REQUEST_TIMEOUT.toString())
+                                .getBytes(StandardCharsets.UTF_8));
+            }
+        };
+        */
+
+        /*
+        return new ByteArrayResource("fallback".getBytes(StandardCharsets.UTF_8), null);
+        */
+
+        return new InputStreamResource(new ByteArrayInputStream(
+                ("this is fallback\n" + HttpStatus.REQUEST_TIMEOUT.toString())
+                .getBytes(StandardCharsets.UTF_8)));
+
     }
 
 
