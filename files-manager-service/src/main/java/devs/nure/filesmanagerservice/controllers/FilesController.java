@@ -26,7 +26,7 @@ public class FilesController {
 
     @GetMapping("/{fileID}")
     public ResponseEntity<Resource> uploadFile(@PathVariable String fileID){
-        Resource resource = filesService.downloadFile(fileID);
+        Resource resource = filesService.getFileRes(fileID);
         FileInfo info = filesService.getFileInfo(fileID);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, info.getContentType())
@@ -36,7 +36,7 @@ public class FilesController {
 
     @GetMapping("/{fileID}/download")
     public ResponseEntity<Resource> uploadFileAsAttachment(@PathVariable String fileID){
-        Resource resource = filesService.downloadFile(fileID);
+        Resource resource = filesService.getFileResDwnld(fileID);
         FileInfo info = filesService.getFileInfo(fileID);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" +info.getName() + "\"")

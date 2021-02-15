@@ -11,7 +11,8 @@ public interface FilesService {
     FileInfo generateFileMetaInformation(MultipartFile file, CreateFile createFile);
     FileInfo manageFile(MultipartFile file, CreateFile createFile);
     StoredFile sendFileToStorage(MultipartFile file, String uniqID, String mataID);
-    Resource downloadFile(String fileID);
+    Resource getFileResDwnld(String fileID);
+    Resource getFileRes(String fileID);
     FileInfo getFileInfo(String fileId);
     void removeFile(String fileId);
     String getChecksum(MultipartFile file);

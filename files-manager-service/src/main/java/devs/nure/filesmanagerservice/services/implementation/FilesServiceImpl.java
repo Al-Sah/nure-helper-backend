@@ -1,6 +1,7 @@
 package devs.nure.filesmanagerservice.services.implementation;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import devs.nure.filesmanagerservice.exceptions.*;
 import devs.nure.filesmanagerservice.feign.*;
 import devs.nure.filesmanagerservice.forms.StoredFile;
@@ -16,7 +17,9 @@ import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -126,14 +129,29 @@ public class FilesServiceImpl implements FilesService {
         return storedFile;
     }
 
-    @HystrixCommand(fallbackMethod = "downloadFileFallbackMethod")
+    @HystrixCommand(fallbackMethod = "getFileResFallbackMethod",
+                    commandProperties = {
+                            @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "1000"),
+                            @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = "10000"),
+                            @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "60"),
+                            @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
+                            @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "60000")
+                    })
     @Override
-    public Resource downloadFile(String fileID) {
-        Locator locator = locatorRepository.findByFileMetaInfoUUID(fileID).orElseThrow(() -> new FileNotFoundException(fileID));
+    public Resource getFileRes(String fileID) {
+        Locator locator = locatorRepository.findByFileMetaInfoUUID(fileID)
+                                           .orElseThrow(() -> new FileNotFoundException(fileID));
         return storageServer.getFile(locator.getPath());
     }
 
-    public Resource downloadFileFallbackMethod(String fileID) {
+    @Override
+    public Resource getFileResDwnld(String fileID) {
+        Locator locator = locatorRepository.findByFileMetaInfoUUID(fileID)
+                                           .orElseThrow(() -> new FileNotFoundException(fileID));
+        return storageServer.getFile(locator.getPath());
+    }
+
+    public Resource getFileResFallbackMethod(String fileID) {
 
         /*return new AbstractResource() {
             @Override
@@ -150,14 +168,12 @@ public class FilesServiceImpl implements FilesService {
         };
         */
 
-        /*
         return new ByteArrayResource("fallback".getBytes(StandardCharsets.UTF_8), null);
-        */
 
-        return new InputStreamResource(new ByteArrayInputStream(
+        /*return new InputStreamResource(new ByteArrayInputStream(
                 ("this is fallback\n" + HttpStatus.REQUEST_TIMEOUT.toString())
                 .getBytes(StandardCharsets.UTF_8)));
-
+        */
     }
 
 
