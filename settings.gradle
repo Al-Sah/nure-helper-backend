@@ -7,3 +7,4 @@ include 'eureka-server'
 // Services
 include 'files-manager-service'
 include 'meta-info-service'
+include 'zuul'
