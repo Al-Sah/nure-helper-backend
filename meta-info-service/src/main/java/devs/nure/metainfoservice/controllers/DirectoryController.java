@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/dirs")
+@RequestMapping("/api/v1/meta-info/dirs")
 public class DirectoryController {
 
     private final DirectoryService directoryService;

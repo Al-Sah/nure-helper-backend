@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/v1/files")
+@RequestMapping("/api/v1/manager")
 public class FilesController {
 
     private final FilesService filesService;

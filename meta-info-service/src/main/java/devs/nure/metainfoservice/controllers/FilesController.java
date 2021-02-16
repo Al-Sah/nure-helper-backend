@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/files")
+@RequestMapping("/api/v1/meta-info/files")
 public class FilesController {
 
     private final FileService fileService;
